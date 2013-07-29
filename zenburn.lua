@@ -7,8 +7,8 @@
 
 -- {{{ Main
 theme = {}
-theme.confdir       = awful.util.getdir("config")
-theme.wallpaper_cmd = { "awsetbg /usr/share/awesome/themes/zenburn/groelandia.jpg" }
+theme.confdir       = "~/.config/awesome" --awful.util.getdir("config")
+theme.wallpaper_cmd = { "awsetbg /usr/share/awesome/themes/zenburn/datalove.png" }
 -- }}}
 
 
@@ -60,6 +60,7 @@ theme.mouse_finder_color = theme.fg_urgent
 
 -- {{{ Taglist and Tasklist
 -- theme.[taglist|tasklist]_[bg|fg]_[focus|urgent]
+theme.tasklist_disable_icon = true
 -- }}}
 
 -- {{{ Menu
