@@ -161,8 +161,9 @@ mytasklist.buttons = awful.util.table.join(
 --
 -- {{{ Reusable separator
 --space = widget({ type = "textbox" })
-space = wibox.widget.textbox()
-space.width = 4
+local space = wibox.widget.base.make_widget()
+space.fit = function() return 4,0 end
+space.draw = function() end
 --separator = widget({ type = "imagebox" })
 separator = wibox.widget.imagebox()
 separator:set_image(beautiful.widget_sep)
@@ -281,28 +282,6 @@ for s = 1, scount do
     })
 
     -- Add widgets to the wibox
-	--[[
-    mywibox[s]:set_widgets({
-		layout = awful.widget.layout.vertical.flex,
-		{
-			{
-				space, mylayoutbox[s], mytaglist[s], separator, space, mypromptbox[s],
-				["layout"] = awful.widget.layout.horizontal.leftright
-			},
-			{
-				space, datewidget, space, dateicon,
-				separator, wlanwidget, space, wlanicon,
-				separator, volwidget, space, volicon,
-				separator, batwidget, space, baticon,
-				separator, memwidget, space, memicon,
-				separator, tzswidget, space, cpufreqwidget, space, cpuwidget, space, cpuicon,
-				separator, --s == 1 and systray or nil,
-				["layout"] = awful.widget.layout.horizontal.rightleft
-			}
-		},
-        mytasklist[s],
-    })
-	]]--
     -- Widgets that are aligned to the left
     local left_layout = wibox.layout.fixed.horizontal()
     left_layout:add(space)
@@ -314,11 +293,18 @@ for s = 1, scount do
 
     -- Widgets that are aligned to the right
     local right_layout = wibox.layout.fixed.horizontal()
-    if s == 1 then right_layout:add(wibox.widget.systray()) end
-	right_layout:add(space)
-	right_layout:add(datewidget)
-	right_layout:add(space)
-	right_layout:add(dateicon)
+	local mytoolbar = {
+		separator, --s == 1 and systray or nil,
+		cpuicon, space, cpuwidget, space, cpufreqwidget, space, tzswidget, separator,
+		volicon, space, volwidget, separator, 
+		memicon, space, memwidget, separator, 
+		baticon, space, batwidget, separator, 
+		wlanicon, space, wlanwidget, separator, 
+		dateicon, space, datewidget, space
+	}
+	for k,v in pairs(mytoolbar) do
+		right_layout:add(v)
+	end
 
     -- Join left and right layouts
     local layout_top = wibox.layout.align.horizontal()
