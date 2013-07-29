@@ -8,7 +8,7 @@
 -- {{{ Main
 theme = {}
 theme.confdir       = "~/.config/awesome" --awful.util.getdir("config")
-theme.wallpaper_cmd = { "awsetbg /usr/share/awesome/themes/zenburn/datalove.png" }
+theme.wallpaper = "/usr/share/awesome/themes/zenburn/datalove.png"
 -- }}}
 
 
