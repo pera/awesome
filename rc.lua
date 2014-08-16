@@ -105,7 +105,7 @@ myawesomemenu = {
 }
 
 mymainmenu = awful.menu({ items = { { "awesome", myawesomemenu, beautiful.awesome_icon },
-                                    { "open terminal", terminal }, { "chromium", "chromium --user-data-dir"}, { "lock screen", "xlock -mode demon -neighbors 8" }, { "suspend", "pm-suspend" }
+                                    { "open terminal", terminal }, { "chromium", "chromium --enable-webgl --user-data-dir"}, { "lock screen", "xlock -mode demon -neighbors 8" }, { "suspend", "pm-suspend" }
                                   }
                         })
 
@@ -115,6 +115,70 @@ mylauncher = awful.widget.launcher({ image = beautiful.awesome_icon,
 -- Menubar configuration
 menubar.utils.terminal = terminal -- Set the terminal for applications that require it
 -- }}}
+
+-- ====================================
+-- BEGIN OF AWESOMPD WIDGET DECLARATION
+-- ====================================
+
+local awesompd = require('awesompd/awesompd')
+
+musicicon = wibox.widget.imagebox()
+musicicon:set_image(beautiful.widget_music)
+musicwidget = awesompd:create() -- Create awesompd widget
+musicwidget.font = "nu 8" -- Set widget font
+--musicwidget.font_color = "#FFFFFF" --Set widget font color
+--musicwidget.background = "#000000" --Set widget background color
+musicwidget.scrolling = true -- If true, the text in the widget will be scrolled
+--musicwidget.output_size = 20 -- Set the size of widget in symbols
+musicwidget.update_interval = 10 -- Set the update interval in seconds
+
+-- Set the folder where icons are located (change username to your login name)
+musicwidget.path_to_icons = "/root/.config/awesome/icons"
+
+-- If true, song notifications for Jamendo tracks and local tracks
+-- will also contain album cover image.
+musicwidget.show_album_cover = true
+
+-- terrible hack
+musicwidget.show_status = false
+
+-- Specify how big in pixels should an album cover be. Maximum value
+-- is 100.
+musicwidget.album_cover_size = 50
+
+-- This option is necessary if you want the album covers to be shown
+-- for your local tracks.
+musicwidget.mpd_config = "/etc/mpd.conf"
+
+-- Specify decorators on the left and the right side of the
+-- widget. Or just leave empty strings if you decorate the widget
+-- from outside.
+musicwidget.ldecorator = ""
+musicwidget.rdecorator = ""
+
+-- Set all the servers to work with (here can be any servers you use)
+musicwidget.servers = {
+	{ server = "localhost",
+	port = 6600 }
+}
+
+-- Set the buttons of the widget. Keyboard keys are working in the
+-- entire Awesome environment. Also look at the line 352.
+musicwidget:register_buttons({ { "", awesompd.MOUSE_LEFT, musicwidget:command_playpause() },
+{ "Control", awesompd.MOUSE_SCROLL_UP, musicwidget:command_prev_track() },
+{ "Control", awesompd.MOUSE_SCROLL_DOWN, musicwidget:command_next_track() },
+{ "", awesompd.MOUSE_SCROLL_UP, musicwidget:command_volume_up() },
+{ "", awesompd.MOUSE_SCROLL_DOWN, musicwidget:command_volume_down() },
+{ "", awesompd.MOUSE_RIGHT, musicwidget:command_show_menu() },
+{ "", "XF86AudioLowerVolume", musicwidget:command_volume_down() },
+{ "", "XF86AudioRaiseVolume", musicwidget:command_volume_up() },
+{ modkey, "Pause", musicwidget:command_playpause() } })
+
+musicwidget:run() -- After all configuration is done, run the widget
+
+-- ==================================
+-- END OF AWESOMPD WIDGET DECLARATION
+-- ==================================
 
 -- {{{ Wibox
 
@@ -196,7 +260,13 @@ baticon:set_image(beautiful.widget_bat)
 -- Initialize widget
 batwidget = wibox.widget.textbox()
 -- Register widget
-vicious.register(batwidget, vicious.widgets.bat, "$1$2%", 11, "BAT1")
+vicious.register(batwidget, vicious.widgets.bat, function (widget, args)
+													if args[2] < 10 then
+														return "<span color='red'>" .. args[1] .. args[2] .. "%</span>"
+													else
+														return args[1] .. args[2] .. "%"
+													end
+												 end , 11, "BAT1")
 -- }}}
 
 -- {{{ Memory usage
@@ -247,10 +317,6 @@ dateicon:set_image(beautiful.widget_date)
 datewidget = wibox.widget.textbox()
 -- Register widget
 vicious.register(datewidget, vicious.widgets.date, "%a %b %d %R %Z", 60)
--- Register buttons
-datewidget:buttons(awful.util.table.join(
-  awful.button({ }, 1, function () exec("pylendar.py") end)
-))
 -- }}}
 
 -- {{{ System tray
@@ -302,7 +368,8 @@ for s = 1, scount do
     -- Widgets that are aligned to the right
     local right_layout = wibox.layout.fixed.horizontal()
 	local mytoolbar = {
-		separator, --s == 1 and systray or nil,
+		-- separator, s == 1 and systray or nil,
+		musicwidget.widget, separator,
 		cpuicon, space, cpuwidget, space, cpufreqwidget, space, tzswidget, separator,
 		volicon, space, volwidget, separator, 
 		memicon, space, memwidget, separator, 
@@ -472,6 +539,7 @@ clientbuttons = awful.util.table.join(
     awful.button({ modkey }, 3, awful.mouse.client.resize))
 
 -- Set keys
+musicwidget:append_global_keys()
 root.keys(globalkeys)
 -- }}}
 
@@ -486,13 +554,16 @@ awful.rules.rules = {
                      buttons = clientbuttons } },
     { rule = { class = "MPlayer" },
       properties = { floating = true } },
-    { rule = { class = "pinentry" },
+    { rule = { class = "audacious" },
       properties = { floating = true } },
     { rule = { class = "gimp" },
       properties = { floating = true } },
-    -- Set Firefox to always map on tags number 2 of screen 1.
-    -- { rule = { class = "Firefox" },
-    --   properties = { tag = tags[1][2] } },
+	{ rule = { class = "Firefox" },
+	  properties = { tag = tags[1][1] } },
+	{ rule = { class = "Thunderbird" },
+	  properties = { tag = tags[1][5] } },
+	{ rule = { class = "Pidgin" },
+	  properties = { tag = tags[1][4] } },
 }
 -- }}}
 
