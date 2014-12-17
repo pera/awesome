@@ -104,8 +104,23 @@ myawesomemenu = {
    { "quit", awesome.quit }
 }
 
-mymainmenu = awful.menu({ items = { { "awesome", myawesomemenu, beautiful.awesome_icon },
-                                    { "open terminal", terminal }, { "chromium", "chromium --enable-webgl --user-data-dir"}, { "lock screen", "xlock -mode demon -neighbors 8" }, { "suspend", "pm-suspend" }
+editorsmenu = {
+	{ "Gummi", "gummi" },
+	{ "LyX", "lyx" },
+	{ "Gaphor", "graphor" }
+}
+
+gamesmenu = {
+	{ "GNU Go", "gogui" },
+	{ "Nethack", "nethack" },
+	{ "Angband", "angband" },
+	{ "MAngband", "mangclient --width 800 --height 600" },
+	{ "Crawl", "xterm crawl" },
+	{ "ADOM", "xterm adom" },
+	{ "Slash'EM", "xterm slashem" },
+}
+
+mymainmenu = awful.menu({ items = { { "awesome", myawesomemenu, beautiful.awesome_icon }, { "editors", editorsmenu, beautiful.awesome_icon }, { "games", gamesmenu, beautiful.awesome_icon }, { "open terminal", terminal }, { "chromium", "chromium --enable-webgl --user-data-dir"}, { "lock screen", "xlock -mode demon -neighbors 8" }, { "suspend", "pm-suspend" }
                                   }
                         })
 
@@ -170,8 +185,8 @@ musicwidget:register_buttons({ { "", awesompd.MOUSE_LEFT, musicwidget:command_pl
 { "", awesompd.MOUSE_SCROLL_UP, musicwidget:command_volume_up() },
 { "", awesompd.MOUSE_SCROLL_DOWN, musicwidget:command_volume_down() },
 { "", awesompd.MOUSE_RIGHT, musicwidget:command_show_menu() },
-{ "", "XF86AudioLowerVolume", musicwidget:command_volume_down() },
-{ "", "XF86AudioRaiseVolume", musicwidget:command_volume_up() },
+--{ "", "XF86AudioLowerVolume", musicwidget:command_volume_down() },
+--{ "", "XF86AudioRaiseVolume", musicwidget:command_volume_up() },
 { modkey, "Pause", musicwidget:command_playpause() } })
 
 musicwidget:run() -- After all configuration is done, run the widget
@@ -466,7 +481,11 @@ globalkeys = awful.util.table.join(
                   mypromptbox[mouse.screen].widget,
                   awful.util.eval, nil,
                   awful.util.getdir("cache") .. "/history_eval")
-              end)
+              end),
+
+	-- Volume
+	awful.key({ }, "XF86AudioRaiseVolume", function () awful.util.spawn("amixer set PCM 2dB+", false) end),
+	awful.key({ }, "XF86AudioLowerVolume", function () awful.util.spawn("amixer set PCM 2dB-", false) end)
 )
 
 clientkeys = awful.util.table.join(
